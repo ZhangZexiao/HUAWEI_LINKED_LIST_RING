@@ -91,6 +91,112 @@ private:
 		std::cout << "The joint node is placed at " << this->GetJointIndex() << "th node in the linked list." << std::endl;
 	}
 };
+bool isLoop(HW_LinkedListRing *linkedList)
+{
+	HW_Node *n1 = linkedList->GetHead(), *n2 = linkedList->GetHead();
+	ull count = 0;
+	while (n1 && n2)
+	{
+		n1 = n1->next;
+		if (nullptr == n2->next)
+		{
+			return false;
+		}
+		n2 = n2->next->next;
+		count++;
+		if (n1 == n2)
+		{
+			std::cout << "Classic algorithm, We compared " << count << " times to get result." << std::endl;
+			double currentCompareTime = count / (double)linkedList->GetSize();
+			std::cout << "compare times / list size = " << currentCompareTime << std::endl;
+			static double maxCompareTime = 0;
+			if (maxCompareTime < currentCompareTime)
+			{
+				maxCompareTime = currentCompareTime;
+			}
+			std::cout << "MAX: compare times / list size = " << maxCompareTime << std::endl;
+			return true;
+		}
+		
+	}
+	return false;
+}
+bool isLoop3(HW_LinkedListRing *linkedList)
+{
+	HW_Node *n1 = linkedList->GetHead(), *n2 = linkedList->GetHead();
+	ull count = 0;
+	while (n1 && n2)
+	{
+		n1 = n1->next;
+		if (nullptr == n2->next)
+		{
+			return false;
+		}
+		if (nullptr == n2->next->next)
+		{
+			return false;
+		}
+		n2 = n2->next->next->next;
+		count++;
+		if (n1 == n2)
+		{
+			std::cout << "Variant 3 of classic algorithm, We compared " << count << " times to get result." << std::endl;
+			double currentCompareTime = count / (double)linkedList->GetSize();
+			std::cout << "compare times / list size = " << currentCompareTime << std::endl;
+			static double maxCompareTime = 0;
+			if (maxCompareTime < currentCompareTime)
+			{
+				maxCompareTime = currentCompareTime;
+			}
+			std::cout << "MAX: compare times / list size = " << maxCompareTime << std::endl;
+			return true;
+		}
+
+	}
+	return false;
+}
+bool isLoop5(HW_LinkedListRing *linkedList)
+{
+	HW_Node *n1 = linkedList->GetHead(), *n2 = linkedList->GetHead();
+	ull count = 0;
+	while (n1 && n2)
+	{
+		n1 = n1->next;
+		if (nullptr == n2->next)
+		{
+			return false;
+		}
+		if (nullptr == n2->next->next)
+		{
+			return false;
+		}
+		if (nullptr == n2->next->next->next)
+		{
+			return false;
+		}
+		if (nullptr == n2->next->next->next->next)
+		{
+			return false;
+		}
+		n2 = n2->next->next->next->next->next;
+		count++;
+		if (n1 == n2)
+		{
+			std::cout << "Variant 5 of classic algorithm, We compared " << count << " times to get result." << std::endl;
+			double currentCompareTime = count / (double)linkedList->GetSize();
+			std::cout << "compare times / list size = " << currentCompareTime << std::endl;
+			static double maxCompareTime = 0;
+			if (maxCompareTime < currentCompareTime)
+			{
+				maxCompareTime = currentCompareTime;
+			}
+			std::cout << "MAX: compare times / list size = " << maxCompareTime << std::endl;
+			return true;
+		}
+
+	}
+	return false;
+}
 bool isRing(HW_LinkedListRing *linkedList)
 {
 	HW_Node *i1 = linkedList->GetHead(), *i2 = linkedList->GetHead()->next;
@@ -143,17 +249,25 @@ int main()
 	std::default_random_engine generator;
 	// make sure n >= 1, that there at least 1 node.
 	std::uniform_int_distribution<ull> distribution(1, UINT16_MAX);
-	HW_LinkedListRing llr1(1, 0);
-	printRing(isRing(&llr1));
-	HW_LinkedListRing llr2(1, 1);
-	printRing(isRing(&llr2));
-	HW_LinkedListRing llr3(100, 0);
-	printRing(isRing(&llr3));
-	HW_LinkedListRing llr4(100, 99);
-	printRing(isRing(&llr4));
-	ull tmp = 1000;
+	//HW_LinkedListRing llr1(1, 0);
+	//printRing(isRing(&llr1));
+	//printRing(isLoop(&llr1));
+	//printRing(isLoop3(&llr1));
+	//HW_LinkedListRing llr2(1, 1);
+	//printRing(isRing(&llr2));
+	//printRing(isLoop(&llr2));
+	//printRing(isLoop3(&llr2));
+	//HW_LinkedListRing llr3(100, 0);
+	//printRing(isRing(&llr3));
+	//printRing(isLoop(&llr3));
+	//printRing(isLoop3(&llr3));
+	//HW_LinkedListRing llr4(100, 99);
+	//printRing(isRing(&llr4));
+	//printRing(isLoop(&llr4));
+	//printRing(isLoop3(&llr4));
+	ull tmp = 100;
 	while (tmp > 0)
-	{		
+	{
 		ull n = distribution(generator);
 		// because there at least 1 node, so (n - 1 >= 0). 
 		std::uniform_int_distribution<ull> distribution(0, n - 1);
@@ -161,6 +275,9 @@ int main()
 
 		HW_LinkedListRing *ring = new HW_LinkedListRing(n, jointIndex);
 		printRing(isRing(ring));
+		printRing(isLoop(ring));
+		printRing(isLoop3(ring));
+		printRing(isLoop5(ring));
 		//getchar();
 		delete ring;
 		tmp--;
