@@ -11,6 +11,17 @@ struct HW_Node
 	// "index" for debug printing, useless
 	ull index;
 	HW_Node *next;
+	HW_Node():index(ULLONG_MAX), next(nullptr)
+	{
+	}
+	HW_Node *GetNextNext()
+	{
+		if (nullptr == this->next)
+		{
+			return nullptr;
+		}
+		return this->next->next;
+	}
 };
 class HW_LinkedListRing
 {
@@ -25,6 +36,7 @@ public:
 	~HW_LinkedListRing()
 	{
 		this->Destruct();
+		this->PrintInformation();
 	}
 	HW_Node *GetHead()
 	{
@@ -36,11 +48,13 @@ public:
 	}
 	ull GetJointIndex()
 	{
-		if (nullptr != this->joint)
+		// special case
+		if (nullptr == this->joint)
 		{
-			return this->joint->index;
+			return ULLONG_MAX;			
 		}
-		return ULLONG_MAX;
+		// main case
+		return this->joint->index;
 	}
 private:
 	void Construct()
@@ -48,18 +62,18 @@ private:
 		// create the head node
 		this->head = new HW_Node();
 		this->head->index = 0;
-		// if size equals 1, then it will not enter while loop, joint assignment will not be called.
-		// following special if code block fixed this case + joint index equals 0.
+		// if the size equals 1, then it will not enter the while looping, and then joint assignment statement will not be called/hit.
+		// the following special "if" code block fixed this case: size equals 1 + joint index equals 0.
 		if (0 == this->jointIndex)
 		{
 			this->joint = this->GetHead();
 		}
-		// prepare for looping
+		// prepare for the while looping
 		HW_Node *current = this->GetHead();
 		ull tmpIndex = 0;
 		while (tmpIndex < this->GetSize() - 1)
 		{
-			// set joint node
+			// set the joint node
 			if (this->jointIndex == tmpIndex)
 			{
 				this->joint = current;
@@ -67,11 +81,11 @@ private:
 			// fill current node
 			current->index = tmpIndex;
 			current->next = new HW_Node();
-			// prepare for next node
+			// prepare for the next node
 			current = current->next;
 			tmpIndex++;
 		}
-		// make the ring
+		// make it a ring
 		current->index = tmpIndex;
 		current->next = this->joint;
 	}
@@ -84,6 +98,10 @@ private:
 			delete this->head;
 			this->head = tmpNext;
 		}
+		this->head = nullptr;
+		this->joint = nullptr;
+		this->size = 0;
+		this->jointIndex = ULLONG_MAX;
 	}
 	void PrintInformation()
 	{
@@ -93,35 +111,43 @@ private:
 };
 bool isLoop(HW_LinkedListRing *linkedList)
 {
-	HW_Node *n1 = linkedList->GetHead(), *n2 = linkedList->GetHead();
-	ull count = 0;
+	// prepare for the statistics
+	ull countStep = 0;
 	int n1j = 0, n2j = 0, nj = 0;
 	static int maxNj = 0;
+	// prepare for the while looping
+	HW_Node *n1 = linkedList->GetHead(), *n2 = linkedList->GetHead();
 	while (n1 && n2)
 	{
 		n1 = n1->next;
-		if (nullptr == n2->next)
+		n2 = n2->GetNextNext();
+		// only need make sure n2 is not nullptr, because if n1 is nullptr, n2 is nullptr definitely.
+		if (nullptr == n1 || nullptr == n2)
 		{
 			return false;
 		}
-		n2 = n2->next->next;
+		// the statistics
 		if (n1->index == linkedList->GetJointIndex())
 		{
+			// how many times n1 step over the joint node!
 			n1j++;
 		}
 		if (n2->index == linkedList->GetJointIndex() || n2->index - 1 == linkedList->GetJointIndex())
 		{
+			// how many times n2 step over the joint node!
 			n2j++;
 			if (n1j > 0)
 			{
+				// how many times n2 step over the joint node after n1 and n2 both in the ring!
 				nj++;
+				// record the max of nj
 				if (maxNj < nj)
 				{
 					maxNj = nj;
 				}
 			}
 		}
-		count++;
+		countStep++;
 		if (n1 == n2)
 		{
 			std::cout << "n1 index is " << n1->index << ", n2 index is " << n2->index << ", n1j is " << n1j << ", n2j is " << n2j
@@ -130,8 +156,8 @@ bool isLoop(HW_LinkedListRing *linkedList)
 				<< std::endl;
 			//X000__>00X00__>0000X0__>000000X
 			//000X   0000X   00000X   000000X
-			std::cout << "Classic algorithm, We compared " << count << " times to get result." << std::endl;
-			double currentCompareTime = count / (double)linkedList->GetSize();
+			std::cout << "Classic algorithm, We compared " << countStep << " times to get the result." << std::endl;
+			double currentCompareTime = countStep / (double)linkedList->GetSize();
 			std::cout << "compare times / list size = " << currentCompareTime << std::endl;
 			static double maxCompareTime = 0;
 			if (maxCompareTime < currentCompareTime)
@@ -140,8 +166,7 @@ bool isLoop(HW_LinkedListRing *linkedList)
 			}
 			std::cout << "MAX: compare times / list size = " << maxCompareTime << std::endl;
 			return true;
-		}
-		
+		}		
 	}
 	return false;
 }
