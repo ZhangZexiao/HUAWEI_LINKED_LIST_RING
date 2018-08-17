@@ -92,11 +92,13 @@ private:
 	void Destruct()
 	{
 		HW_Node *tmpNext;
-		while (nullptr != head)
+		while (nullptr != this->head && this->size > 0)
 		{
 			tmpNext = this->head->next;
 			delete this->head;
 			this->head = tmpNext;
+
+			this->size--;
 		}
 		this->head = nullptr;
 		this->joint = nullptr;
