@@ -22,7 +22,7 @@ public:
 		this->Construct();
 		this->PrintInformation();
 	}
-	HW_LinkedListRing()
+	~HW_LinkedListRing()
 	{
 		this->Destruct();
 	}
