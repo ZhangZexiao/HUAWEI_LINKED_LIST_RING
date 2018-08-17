@@ -95,6 +95,8 @@ bool isLoop(HW_LinkedListRing *linkedList)
 {
 	HW_Node *n1 = linkedList->GetHead(), *n2 = linkedList->GetHead();
 	ull count = 0;
+	int n1j = 0, n2j = 0, nj = 0;
+	static int maxNj = 0;
 	while (n1 && n2)
 	{
 		n1 = n1->next;
@@ -103,9 +105,31 @@ bool isLoop(HW_LinkedListRing *linkedList)
 			return false;
 		}
 		n2 = n2->next->next;
+		if (n1->index == linkedList->GetJointIndex())
+		{
+			n1j++;
+		}
+		if (n2->index == linkedList->GetJointIndex() || n2->index - 1 == linkedList->GetJointIndex())
+		{
+			n2j++;
+			if (n1j > 0)
+			{
+				nj++;
+				if (maxNj < nj)
+				{
+					maxNj = nj;
+				}
+			}
+		}
 		count++;
 		if (n1 == n2)
 		{
+			std::cout << "n1 index is " << n1->index << ", n2 index is " << n2->index << ", n1j is " << n1j << ", n2j is " << n2j
+				<< ", nj is " << nj << ", joint index is " << linkedList->GetJointIndex()
+				<< ", size is " << linkedList->GetSize() << ", max nj is " << maxNj
+				<< std::endl;
+			//X000__>00X00__>0000X0__>000000X
+			//000X   0000X   00000X   000000X
 			std::cout << "Classic algorithm, We compared " << count << " times to get result." << std::endl;
 			double currentCompareTime = count / (double)linkedList->GetSize();
 			std::cout << "compare times / list size = " << currentCompareTime << std::endl;
@@ -265,7 +289,7 @@ int main()
 	//printRing(isRing(&llr4));
 	//printRing(isLoop(&llr4));
 	//printRing(isLoop3(&llr4));
-	ull tmp = 100;
+	ull tmp = 1000;
 	while (tmp > 0)
 	{
 		ull n = distribution(generator);
@@ -274,10 +298,10 @@ int main()
 		ull jointIndex = distribution(generator);
 
 		HW_LinkedListRing *ring = new HW_LinkedListRing(n, jointIndex);
-		printRing(isRing(ring));
+		//printRing(isRing(ring));
 		printRing(isLoop(ring));
-		printRing(isLoop3(ring));
-		printRing(isLoop5(ring));
+		//printRing(isLoop3(ring));
+		//printRing(isLoop5(ring));
 		//getchar();
 		delete ring;
 		tmp--;
